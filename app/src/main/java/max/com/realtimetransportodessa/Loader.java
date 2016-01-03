@@ -28,14 +28,16 @@ import max.com.realtimetransportodessa.model.Segment;
 
 public class Loader {
     private static final String TAG = "Loader";
+    private static ContentProvider contentProvider;
     private static Loader loader;
     private Context context;
     private RequestQueue requestQueue;
     private Map<String, String> urls;
 
-    private Loader(Context context) {
+    private Loader(Context context, ContentProvider contentProvider) {
         this.context = context;
         requestQueue = Volley.newRequestQueue(context);
+        Loader.contentProvider = contentProvider;
 
         urls = new HashMap<>();
         urls.put("LoadingListRoutes", "http://transport.odessa.ua/php/LoadingListRoutes.php");
@@ -44,9 +46,9 @@ public class Loader {
         urls.put("LoadingListMaster", "http://transport.odessa.ua/php/LoadingListMaster.php");
     }
 
-    public static Loader getInstance(Context context) {
+    public static Loader getInstance(Context context, ContentProvider contentProvider) {
         if (loader == null) {
-            loader = new Loader(context);
+            loader = new Loader(context, contentProvider);
         }
         return loader;
     }
@@ -74,7 +76,8 @@ public class Loader {
                                             .setTitle(routeJSON.getString("title")).build();
                                     routes.add(route);
                                 }
-                                Log.d(TAG, "Got routes list: " + routes.toString());
+                                contentProvider.setRouteList(routes);
+                                //Log.d(TAG, "Got routes list: " + routes.toString());
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -223,6 +226,7 @@ public class Loader {
                                             .build();
                                     masters.add(master);
                                 }
+                                contentProvider.setMasterList(masters);
                                 Log.d(TAG, "Masters list: " + masters);
                             }
                         } catch (JSONException e) {

@@ -22,7 +22,22 @@
 
     <TextView
         android:layout_width="339dp"
-        android:layout_height="match_parent"
+        android:layout_height="157dp"
         android:id="@+id/routesText"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.70" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Load master list"
+        android:id="@+id/loadMasterListButton"
+        android:layout_gravity="center_horizontal"
+        android:onClick="loadMasterList"/>
+
+    <TextView
+        android:layout_width="344dp"
+        android:layout_height="143dp"
+        android:id="@+id/masterListText"
         android:layout_gravity="center_horizontal" />
 </LinearLayout>
