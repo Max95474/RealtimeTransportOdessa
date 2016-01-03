@@ -1,0 +1,128 @@
+{
+  "url": "http://transport.odessa.ua",
+
+  "LoadingListRoutes": {
+    "parameters": {},
+    "response": {
+      "success": "Boolean",
+      "list": [
+        {
+          "Number": "Int",
+          "Type": "String",
+          "color": "HTML color code",
+          "cost": "Float",
+          "distance": "Float",
+          "eng": "Seems like it not used for now, returns always null",
+          "id": "Int",
+          "title": "String"
+        }
+      ]
+    }
+  },
+
+  "LoadingRoute": {
+    "parameters": {
+      "type": "String",
+      "id": "Int",
+      "language": "String"
+    },
+    "response": {
+      "success": "Boolean",
+      "data": {
+        "Number": "Int",
+        "Type": "String",
+        "color": "HTML color code",
+        "cost": "Float",
+        "distance": "Float",
+        "eng": "Seems like it not used for now, returns always null",
+        "id": "Int",
+        "title": "String",
+        "transport": [],
+        "segments": [
+          {
+            "built": "Int",
+            "direction": "Int",
+            "id": "Int",
+            "position": "Int",
+            "routeId": "Int",
+            "stoppingId": "Int",
+            "points": [
+              {
+                "id": "Int",
+                "lat": "Float",
+                "lng": "Float",
+                "position": "0",
+                "segmentId": "Int"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+
+  "LoadingStopping": {
+    "parameters": {
+      "stopping": ["Number"],
+      "language": "String"
+    },
+    "response": {
+      "success": "Boolean",
+      "data": [
+        {
+          "id": "Int",
+          "lat": "Float",
+          "lng": "Float",
+          "radius": "Int",
+          "title": "String",
+          "routeArr": [
+            {
+              "n": "Int",
+              "position": "Int",
+              "routeId": "Int",
+              "title": "String",
+              "type": "String"
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  "LoadingListStopping": {
+    "parameters": {
+      "language": "String"
+    },
+    "response": {
+      "success": "Boolean",
+      "list": [
+        {
+          "title": "String"
+        }
+      ]
+    }
+  },
+
+  "LoadingStoppingByName": {
+    "parameters": {
+      "language": "String",
+      "name": "String"
+    },
+    "response": "Returns FALSE and SQL statement O_o"
+  },
+
+  "LoadingListMaster": {
+    "parameters": {
+      "language": "String"
+    },
+    "response": {
+      "success": "Boolean",
+      "list": [
+        {
+          "id": "Int",
+          "title": "String"
+        }
+      ]
+    }
+  }
+}
