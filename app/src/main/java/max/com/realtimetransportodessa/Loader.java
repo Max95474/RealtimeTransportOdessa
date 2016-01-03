@@ -3,6 +3,7 @@ package max.com.realtimetransportodessa;
 import android.content.Context;
 import android.util.Log;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -20,7 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import max.com.realtimetransportodessa.model.Master;
+import max.com.realtimetransportodessa.model.Point;
 import max.com.realtimetransportodessa.model.Route;
+import max.com.realtimetransportodessa.model.Segment;
 
 public class Loader {
     private static final String TAG = "Loader";
@@ -36,6 +40,8 @@ public class Loader {
         urls = new HashMap<>();
         urls.put("LoadingListRoutes", "http://transport.odessa.ua/php/LoadingListRoutes.php");
         urls.put("LoadingRoute", "http://transport.odessa.ua/php/LoadingRoute.php");
+        urls.put("LoadingListStopping", "http://transport.odessa.ua/php/LoadingListStopping.php");
+        urls.put("LoadingListMaster", "http://transport.odessa.ua/php/LoadingListMaster.php");
     }
 
     public static Loader getInstance(Context context) {
@@ -46,8 +52,8 @@ public class Loader {
     }
 
     public void loadRoutesList() {
-        String URL = "http://transport.odessa.ua/php/LoadingListRoutes.php";
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                urls.get("LoadingListRoutes"),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
@@ -85,13 +91,60 @@ public class Loader {
     }
 
     public void loadRoute(final String type, final String number, final String language) {
-        String url ="http://transport.odessa.ua/php/LoadingRoute.php";
-
-        StringRequest strRequest = new StringRequest(Request.Method.POST, url,
+        StringRequest strRequest = new StringRequest(Request.Method.POST,
+                urls.get("LoadingRoute"),
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d(TAG, "LoadRoute: " + response);
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            if(json.getBoolean("success")) {
+                                Route.Builder routeBuilder = Route.newBuilder();
+                                JSONObject data = json.getJSONObject("data");
+                                routeBuilder
+                                        .setNumber(data.getInt("Number"))
+                                        .setType(data.getString("Type"))
+                                        .setColor(data.getString("color"))
+                                        .setCost(data.getDouble("cost"))
+                                        .setDistance(data.getDouble("distance"))
+                                        .setId(data.getInt("id"))
+                                        .setTitle(data.getString("title"));
+
+                                JSONArray segmentsJSON = data.getJSONArray("segments");
+                                List<Segment> segments = new ArrayList<>();
+                                for(int i = 0; i < segmentsJSON.length(); i++) {
+                                    JSONObject segmentJSON = segmentsJSON.getJSONObject(i);
+                                    Segment.Builder segmentBuilder = Segment.newBuilder()
+                                            .setBuilt(segmentJSON.getInt("built"))
+                                            .setDirection(segmentJSON.getInt("direction"))
+                                            .setId(segmentJSON.getInt("id"))
+                                            .setPosition(segmentJSON.getInt("position"))
+                                            .setRouteId(segmentJSON.getInt("routeId"))
+                                            .setStopping(segmentJSON.getInt("stoppingId"));
+
+                                    JSONArray pointsJSON = segmentJSON.getJSONArray("points");
+                                    List<Point> points = new ArrayList<>();
+                                    for(int j = 0; j < pointsJSON.length(); j++) {
+                                        JSONObject pointJSON = pointsJSON.getJSONObject(j);
+                                        Point point = Point.newBuilder()
+                                                .setId(pointJSON.getInt("id"))
+                                                .setLat(pointJSON.getDouble("lat"))
+                                                .setLng(pointJSON.getDouble("lng"))
+                                                .setPosition(pointJSON.getInt("position"))
+                                                .setSegmentId(pointJSON.getInt("segmentId"))
+                                                .build();
+                                        points.add(point);
+                                    }
+                                    segmentBuilder.setPoints(points);
+                                    segments.add(segmentBuilder.build());
+                                }
+                                routeBuilder.setSegments(segments);
+                                Route route = routeBuilder.build();
+                                Log.d(TAG, "Route: " + route.toString());
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 },
                 new Response.ErrorListener() {
@@ -111,5 +164,85 @@ public class Loader {
         };
 
         requestQueue.add(strRequest);
+    }
+
+    public void loadStoppingList(final String language) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                urls.get("LoadingListStopping"),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            if(json.getBoolean("success")) {
+                                JSONArray listJSON = json.getJSONArray("list");
+                                List<String> stoppingList = new ArrayList<>();
+                                for(int i = 0; i < listJSON.length(); i++) {
+                                    stoppingList.add(listJSON.getJSONObject(i).getString("title"));
+                                }
+                                Log.d(TAG, "Stopping list: " + stoppingList);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Error loading stopping list: " + error);
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("language", language);
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
+    }
+
+    public void loadMasterList(final String language) {
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
+                urls.get("LoadingListMaster"),
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject json = new JSONObject(response);
+                            if(json.getBoolean("success")) {
+                                JSONArray listJSON = json.getJSONArray("list");
+                                List<Master> masters = new ArrayList<>();
+                                for(int i = 0; i < listJSON.length(); i++) {
+                                    JSONObject masterJSON = listJSON.getJSONObject(i);
+                                    Master master = Master.newBuilder()
+                                            .setId(masterJSON.getInt("id"))
+                                            .setTitle(masterJSON.getString("title"))
+                                            .build();
+                                    masters.add(master);
+                                }
+                                Log.d(TAG, "Masters list: " + masters);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "Error loading master list: " + error);
+                    }
+                }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<>();
+                params.put("language", language);
+                return params;
+            }
+        };
+        requestQueue.add(stringRequest);
     }
 }

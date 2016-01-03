@@ -129,6 +129,11 @@ public class Route {
             return this;
         }
 
+        public Builder setSegments(List<Segment> segments) {
+            Route.this.segments = segments;
+            return this;
+        }
+
         public Route build() {
             return Route.this;
         }

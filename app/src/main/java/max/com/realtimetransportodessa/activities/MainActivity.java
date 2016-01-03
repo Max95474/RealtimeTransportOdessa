@@ -31,37 +31,6 @@ public class MainActivity extends AppCompatActivity {
     public void loadRoutes(View view) {
         final TextView routesText = (TextView) findViewById(R.id.routesText);
         Loader loader = Loader.getInstance(this);
-        loader.loadRoute("trolleybuses", "2", "ru");
-        loader.loadRoutesList();
-//        RequestQueue queue = Volley.newRequestQueue(this);
-//        String url = "http://transport.odessa.ua/php/LoadingListRoutes.php";
-//        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-//                new Response.Listener<String>() {
-//                    @Override
-//                    public void onResponse(String response) {
-//                        routesText.setText(response);
-//                        try {
-//                            JSONObject json = new JSONObject(response);
-//                            routesText.setText("Is success: " + json.getBoolean("success"));
-//                            JSONArray routes = json.getJSONArray("list");
-//                            for(int i = 0; i < routes.length(); i++) {
-//                                JSONObject routeObject = routes.getJSONObject(i);
-//                                routesText.append(routeObject.getString("Number") + " " +
-//                                routeObject.getString("Type") + "\n");
-//                            }
-//                        } catch (JSONException e) {
-//                            e.printStackTrace();
-//                            routesText.setText(e.toString());
-//                        }
-//                    }
-//                },
-//                new Response.ErrorListener() {
-//                    @Override
-//                    public void onErrorResponse(VolleyError error) {
-//                        routesText.setText(error.toString());
-//                    }
-//                });
-//        queue.add(stringRequest);
     }
 }
 
