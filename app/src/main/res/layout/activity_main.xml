@@ -11,33 +11,17 @@
     tools:context=".activities.MainActivity"
     android:weightSum="1">
 
-
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Load routes"
-        android:id="@+id/loadRoutesButton"
+        android:text="Map"
+        android:id="@+id/mapButton"
         android:layout_gravity="center_horizontal"
-        android:onClick="loadRoutes"/>
-
-    <TextView
-        android:layout_width="339dp"
-        android:layout_height="157dp"
-        android:id="@+id/routesText"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.70" />
-
-    <Button
-        android:layout_width="match_parent"
+        android:onClick="toMap"/>
+    <ListView
+        android:id="@+id/routesList"
         android:layout_height="wrap_content"
-        android:text="Load master list"
-        android:id="@+id/loadMasterListButton"
-        android:layout_gravity="center_horizontal"
-        android:onClick="loadMasterList"/>
+        android:layout_width="match_parent">
+    </ListView>
 
-    <TextView
-        android:layout_width="344dp"
-        android:layout_height="143dp"
-        android:id="@+id/masterListText"
-        android:layout_gravity="center_horizontal" />
 </LinearLayout>

@@ -94,7 +94,7 @@ public class Loader {
     }
 
     public void loadRoute(final String type, final String number, final String language) {
-        StringRequest strRequest = new StringRequest(Request.Method.POST,
+        StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 urls.get("LoadingRoute"),
                 new Response.Listener<String>() {
                     @Override
@@ -144,6 +144,7 @@ public class Loader {
                                 routeBuilder.setSegments(segments);
                                 Route route = routeBuilder.build();
                                 Log.d(TAG, "Route: " + route.toString());
+                                contentProvider.setRoute(route);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -164,9 +165,16 @@ public class Loader {
                 params.put("language", language);
                 return params;
             }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                return headers;
+            }
         };
 
-        requestQueue.add(strRequest);
+        requestQueue.add(stringRequest);
     }
 
     public void loadStoppingList(final String language) {

@@ -10,6 +10,7 @@ public class ContentProvider extends Observable {
     private List<Route>  routeList;
     private List<String> stoppingList;
     private List<Master> masterList;
+    private Route route;
 
     public ContentProvider() {}
 
@@ -30,6 +31,7 @@ public class ContentProvider extends Observable {
     public void setStoppingList(List<String> stoppingList) {
         this.stoppingList = stoppingList;
         setChanged();
+        notifyObservers("StoppingList");
     }
 
     public List<Master> getMasterList() {
@@ -40,5 +42,15 @@ public class ContentProvider extends Observable {
         this.masterList = masterList;
         setChanged();
         notifyObservers("MasterList");
+    }
+
+    public void setRoute(Route route) {
+        this.route = route;
+        setChanged();
+        notifyObservers("Route");
+    }
+
+    public Route getRoute() {
+        return this.route;
     }
 }

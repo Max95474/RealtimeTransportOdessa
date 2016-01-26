@@ -142,6 +142,6 @@ public class Route {
     @Override
     public String toString() {
         return "Id: " + id + ", Number: " + number + ", Type: " + type + ", Title: " + title +
-                ", Color: " + color + ", Distance: " + distance + ", Cost: " + cost;
+                ", Color: " + color + ", Distance: " + distance + ", Cost: " + cost + "\n";
     }
 }
