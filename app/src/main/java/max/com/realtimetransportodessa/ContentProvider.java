@@ -7,12 +7,22 @@ import max.com.realtimetransportodessa.model.Master;
 import max.com.realtimetransportodessa.model.Route;
 
 public class ContentProvider extends Observable {
+    private static ContentProvider contentProvider;
     private List<Route>  routeList;
     private List<String> stoppingList;
     private List<Master> masterList;
     private Route route;
 
-    public ContentProvider() {}
+    private ContentProvider() {}
+
+    public static ContentProvider getInstnce() {
+        if(contentProvider == null) {
+            contentProvider = new ContentProvider();
+            return contentProvider;
+        } else {
+            return contentProvider;
+        }
+    }
 
     public List<Route> getRouteList() {
         return routeList;

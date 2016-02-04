@@ -177,7 +177,7 @@ public class Loader {
         requestQueue.add(stringRequest);
     }
 
-    public void loadStoppingList(final String language) {
+    public void loadStoppingList(final List<Integer> stoppings, final String language) {
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 urls.get("LoadingListStopping"),
                 new Response.Listener<String>() {
@@ -192,6 +192,7 @@ public class Loader {
                                     stoppingList.add(listJSON.getJSONObject(i).getString("title"));
                                 }
                                 Log.d(TAG, "Stopping list: " + stoppingList);
+                                contentProvider.setStoppingList(stoppingList);
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -208,6 +209,8 @@ public class Loader {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<>();
+                JSONArray stoppingsJSON = new JSONArray(stoppings);
+                params.put("stopping", stoppingsJSON.toString());
                 params.put("language", language);
                 return params;
             }

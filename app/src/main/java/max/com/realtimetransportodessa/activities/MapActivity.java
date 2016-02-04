@@ -1,10 +1,11 @@
 package max.com.realtimetransportodessa.activities;
 
-import android.support.v4.app.FragmentActivity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -12,15 +13,22 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import max.com.realtimetransportodessa.ContentProvider;
 import max.com.realtimetransportodessa.R;
+import max.com.realtimetransportodessa.model.Point;
+import max.com.realtimetransportodessa.model.Route;
+import max.com.realtimetransportodessa.model.Segment;
 
 public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, Observer {
     private static final String TAG = "MapActivity";
-
+    private ContentProvider contentProvider = ContentProvider.getInstnce();
     private GoogleMap mMap;
 
     @Override
@@ -64,10 +72,38 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.moveCamera(CameraUpdateFactory.newLatLng(odessa));
         mMap.animateCamera(CameraUpdateFactory
                 .newLatLngZoom(odessa, 12.0f));
+
+        Route route = contentProvider.getRoute();
+        if(route == null) {
+            Toast.makeText(MapActivity.this, "Route is not loaded", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        drawRoute(route);
     }
 
     @Override
-    public void update(Observable observable, Object data) {
-        Log.d(TAG, "Got event: " + data);
+    public void update(Observable observable, Object event) {
+        Log.d(TAG, "Got event: " + event);
+        if(event.equals("RouteList")) {
+            List<Route> routes = contentProvider.getRouteList();
+            Log.d(TAG, routes.toString());
+        }
+    }
+
+    private void drawRoute(Route route) {
+        PolylineOptions rectOptions = new PolylineOptions();
+
+        List<Segment> segments = route.getSegments();
+        for(Segment segment : segments) {
+            List<Point> points = segment.getPoints();
+            for(Point point : points) {
+                double lat = point.getLat();
+                double lng = point.getLng();
+                rectOptions.add(new LatLng(lat, lng));
+            }
+        }
+
+        rectOptions.color(Color.BLUE);
+        Polyline polyline = mMap.addPolyline(rectOptions);
     }
 }
