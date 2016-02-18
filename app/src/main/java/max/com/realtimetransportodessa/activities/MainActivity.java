@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
         loader.loadRoutesList();
         loader.loadMasterList("ru");
 //        loader.loadStoppingList(0, "ru");
-        loader.loadRoute("tram", "20", "ru");
+//        loader.loadRoute("tram", "10", "ru");
 
 
     }
@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements Observer {
             for(int i = 0; i < routes.size(); i++) {
                 Route route = routes.get(i);
                 values[i] = route.getTitle() + " " + route.getType() + " " + route.getDistance();
+                loader.loadRoute(route.getType(), Integer.toString(route.getNumber()), "ru");
             }
             setList(values);
             Log.d(TAG, contentProvider.getRouteList().toString());
@@ -77,19 +78,24 @@ public class MainActivity extends AppCompatActivity implements Observer {
     }
 
     private void setList(String[] values) {
+        final Intent mapIntent = new Intent(this, MapActivity.class);
         listView = (ListView) findViewById(R.id.routesList);
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1, values);
         listView.setAdapter(adapter);
-//        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                int itemPosition     = position;
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                mapIntent.putExtra("routeIndex", position);
+                Route route = contentProvider.getRouteList().get(position);
+                loader.loadRoute(route.getType(), Integer.valueOf(route.getNumber()).toString(), "ru");
+                startActivity(mapIntent);
+
 //                String  itemValue    = (String) listView.getItemAtPosition(position);
 //                Toast.makeText(getApplicationContext(),
-//                        "Position :" + itemPosition + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
+//                        "Position :" + position + "  ListItem : " + itemValue, Toast.LENGTH_LONG)
 //                        .show();
-//            }
-//        });
+            }
+        });
     }
 }

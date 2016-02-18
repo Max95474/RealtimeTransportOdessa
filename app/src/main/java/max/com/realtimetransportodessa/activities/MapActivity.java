@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,15 +20,17 @@ import java.util.Observable;
 import java.util.Observer;
 
 import max.com.realtimetransportodessa.ContentProvider;
+import max.com.realtimetransportodessa.Loader;
 import max.com.realtimetransportodessa.R;
 import max.com.realtimetransportodessa.model.Point;
 import max.com.realtimetransportodessa.model.Route;
 import max.com.realtimetransportodessa.model.Segment;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, Observer {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
     private static final String TAG = "MapActivity";
     private ContentProvider contentProvider = ContentProvider.getInstnce();
     private GoogleMap mMap;
+    private Route currentRoute;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +40,9 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+
+        int index = getIntent().getIntExtra("routeIndex", 0);
+        currentRoute = contentProvider.getLoadedRoutes().get(index);
     }
 
     @Override
@@ -73,22 +77,20 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
         mMap.animateCamera(CameraUpdateFactory
                 .newLatLngZoom(odessa, 12.0f));
 
-        Route route = contentProvider.getRoute();
-        if(route == null) {
-            Toast.makeText(MapActivity.this, "Route is not loaded", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        drawRoute(route);
+        drawRoute(currentRoute);
+
     }
 
-    @Override
-    public void update(Observable observable, Object event) {
-        Log.d(TAG, "Got event: " + event);
-        if(event.equals("RouteList")) {
-            List<Route> routes = contentProvider.getRouteList();
-            Log.d(TAG, routes.toString());
-        }
-    }
+//    @Override
+//    public void update(Observable observable, Object event) {
+//        Log.d(TAG, "Got event: " + event);
+//        if(event.equals("RouteList")) {
+//            List<Route> routes = contentProvider.getRouteList();
+//            Log.d(TAG, routes.toString());
+//        } else if(event.equals("Route")) {
+//            drawRoute(currentRoute);
+//        }
+//    }
 
     private void drawRoute(Route route) {
         PolylineOptions rectOptions = new PolylineOptions();
@@ -105,5 +107,13 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         rectOptions.color(Color.BLUE);
         Polyline polyline = mMap.addPolyline(rectOptions);
+    }
+
+    private Point getPointByPosition(List<Point> points, int position) {
+        for(Point p : points) {
+            if(p.getPosition() == position)
+                return p;
+        }
+        return null;
     }
 }
