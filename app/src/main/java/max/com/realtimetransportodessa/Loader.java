@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,6 +45,7 @@ public class Loader {
         urls.put("LoadingRoute", "http://transport.odessa.ua/php/LoadingRoute.php");
         urls.put("LoadingListStopping", "http://transport.odessa.ua/php/LoadingListStopping.php");
         urls.put("LoadingListMaster", "http://transport.odessa.ua/php/LoadingListMaster.php");
+        urls.put("GetState", "http://transport.odessa.ua/php/getState.php");
     }
 
     public static Loader getInstance(Context context, ContentProvider contentProvider) {
@@ -260,4 +262,37 @@ public class Loader {
         };
         requestQueue.add(stringRequest);
     }
+
+    public void getState(final ArrayList<String> transportKeys) {
+        String url = urls.get("GetState") + "?";
+        for(int i = 0; i < transportKeys.size(); i++) {
+            url += "imei[]=" + transportKeys.get(i);
+            if(i < transportKeys.size() - 1)
+                url += "&";
+        }
+        StringRequest stringRequest = new StringRequest(Request.Method.GET,
+                url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d(TAG, "Get state: " + response);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e(TAG, "getStateError: " + error);
+                    }
+                }) {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> headers = new HashMap<>();
+                headers.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8");
+                return headers;
+            }
+        };
+
+        requestQueue.add(stringRequest);
+    }
+
 }

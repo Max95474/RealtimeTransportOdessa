@@ -39,8 +39,11 @@ public class MainActivity extends AppCompatActivity implements Observer {
         loader.loadMasterList("ru");
 //        loader.loadStoppingList(0, "ru");
 //        loader.loadRoute("tram", "10", "ru");
-
-
+        ArrayList<String> keys = new ArrayList<>();
+        keys.add("354330030877107");
+        keys.add("354330030884418");
+        keys.add("354330031102604");
+        loader.getState(keys);
     }
 
     public void toMap(View view) {
