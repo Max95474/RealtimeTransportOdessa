@@ -26,6 +26,8 @@ import max.com.realtimetransportodessa.model.Master;
 import max.com.realtimetransportodessa.model.Point;
 import max.com.realtimetransportodessa.model.Route;
 import max.com.realtimetransportodessa.model.Segment;
+import max.com.realtimetransportodessa.model.State;
+import max.com.realtimetransportodessa.model.Transport;
 
 public class Loader {
     private static final String TAG = "Loader";
@@ -143,9 +145,24 @@ public class Loader {
                                     segmentBuilder.setPoints(points);
                                     segments.add(segmentBuilder.build());
                                 }
+                                JSONArray transports = data.getJSONArray("transport");
+                                ArrayList<Transport> transportList = new ArrayList<>();
+                                for(int i = 0; i < transports.length(); i++) {
+                                    JSONObject transportJSON = transports.getJSONObject(i);
+                                    Transport transport = Transport.newBuilder()
+                                            .setId(transportJSON.getString("id"))
+                                            .setInventoryNumber(transportJSON.getString("inventoryNumber"))
+                                            .setUrl(transportJSON.getString("url"))
+                                            .setRouteId(transportJSON.getString("routeId"))
+                                            .setTitle(transportJSON.getString("type"))
+                                            .setSeats(transportJSON.getInt("seats"))
+                                            .setTitle(transportJSON.getString("title"))
+                                            .build();
+                                    transportList.add(transport);
+                                }
                                 routeBuilder.setSegments(segments);
+                                routeBuilder.setTransport(transportList);
                                 Route route = routeBuilder.build();
-                                Log.d(TAG, "Route: " + route.toString());
                                 contentProvider.setRoute(route);
                             }
                         } catch (JSONException e) {
@@ -275,7 +292,26 @@ public class Loader {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.d(TAG, "Get state: " + response);
+                        try {
+                            JSONArray states = new JSONArray(response);
+                            ArrayList<State> stateList = new ArrayList<>();
+                            for(int i = 0; i < states.length(); i++) {
+                                JSONObject stateJSON = states.getJSONObject(i);
+                                State state = State.newBuilder()
+                                        .setLat(stateJSON.getDouble("lat"))
+                                        .setLng(stateJSON.getDouble("lng"))
+                                        .setTs(stateJSON.getString("ts"))
+                                        .setSpeed(stateJSON.getInt("speed"))
+                                        .setAzimuth(stateJSON.getInt("azimut"))
+                                        .setIgnit(stateJSON.getInt("ignit"))
+                                        .setGsmPower(stateJSON.getInt("gsmpower"))
+                                        .setImei(stateJSON.getString("imei"))
+                                        .build();
+                                stateList.add(state);
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                     }
                 },
                 new Response.ErrorListener() {
@@ -294,5 +330,4 @@ public class Loader {
 
         requestQueue.add(stringRequest);
     }
-
 }

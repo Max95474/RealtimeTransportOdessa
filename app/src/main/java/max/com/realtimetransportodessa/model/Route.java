@@ -12,6 +12,7 @@ public class Route {
     private double cost;
     private String language;
     private List<Segment> segments;
+    private List<Transport> transport;
 
     public Route() {}
 
@@ -87,6 +88,14 @@ public class Route {
         this.segments = segments;
     }
 
+    public List<Transport> getTransport() {
+        return transport;
+    }
+
+    public void setTransport(List<Transport> transport) {
+        this.transport = transport;
+    }
+
     public static Builder newBuilder() {
         return new Route().new Builder();
     }
@@ -131,6 +140,11 @@ public class Route {
 
         public Builder setSegments(List<Segment> segments) {
             Route.this.segments = segments;
+            return this;
+        }
+
+        public Builder setTransport(List<Transport> transport) {
+            Route.this.transport = transport;
             return this;
         }
 

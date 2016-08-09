@@ -8,6 +8,7 @@ import java.util.Observable;
 
 import max.com.realtimetransportodessa.model.Master;
 import max.com.realtimetransportodessa.model.Route;
+import max.com.realtimetransportodessa.model.State;
 
 public class ContentProvider extends Observable {
     private static final String TAG = "ContentProvider";
