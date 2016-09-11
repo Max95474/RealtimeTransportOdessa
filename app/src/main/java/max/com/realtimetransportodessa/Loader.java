@@ -57,6 +57,10 @@ public class Loader {
         return loader;
     }
 
+    public static Loader getInstance() {
+        return loader;
+    }
+
     public void loadRoutesList() {
         StringRequest stringRequest = new StringRequest(Request.Method.POST,
                 urls.get("LoadingListRoutes"),
@@ -309,6 +313,7 @@ public class Loader {
                                         .build();
                                 stateList.add(state);
                             }
+                            contentProvider.setState(stateList);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }

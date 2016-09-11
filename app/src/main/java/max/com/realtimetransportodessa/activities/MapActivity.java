@@ -15,6 +15,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -25,12 +26,16 @@ import max.com.realtimetransportodessa.R;
 import max.com.realtimetransportodessa.model.Point;
 import max.com.realtimetransportodessa.model.Route;
 import max.com.realtimetransportodessa.model.Segment;
+import max.com.realtimetransportodessa.model.State;
+import max.com.realtimetransportodessa.model.Transport;
 
-public class MapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MapActivity extends AppCompatActivity implements OnMapReadyCallback, Observer {
     private static final String TAG = "MapActivity";
     private ContentProvider contentProvider = ContentProvider.getInstnce();
+    private Loader loader = Loader.getInstance();
     private GoogleMap mMap;
     private Route currentRoute;
+    private List<State> stateList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +48,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         int index = getIntent().getIntExtra("routeIndex", 0);
         currentRoute = contentProvider.getLoadedRoutes().get(index);
+        ArrayList<String> transortKeys = new ArrayList<>();
+        List<Transport> transport = currentRoute.getTransport();
+        for(Transport transportEntity : transport) {
+            transortKeys.add(transportEntity.getId());
+        }
+        loader.getState(transortKeys);
     }
 
     @Override
@@ -72,25 +83,24 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
 
         // Add a marker in Sydney and move the camera
         LatLng odessa = new LatLng(46.473765, 30.728540);
-        mMap.addMarker(new MarkerOptions().position(odessa).title("Marker in Odessa"));
+//        mMap.addMarker(new MarkerOptions().position(odessa).title("Marker in Odessa"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(odessa));
         mMap.animateCamera(CameraUpdateFactory
                 .newLatLngZoom(odessa, 12.0f));
 
         drawRoute(currentRoute);
-
+        contentProvider.addObserver(this);
     }
 
-//    @Override
-//    public void update(Observable observable, Object event) {
-//        Log.d(TAG, "Got event: " + event);
-//        if(event.equals("RouteList")) {
-//            List<Route> routes = contentProvider.getRouteList();
-//            Log.d(TAG, routes.toString());
-//        } else if(event.equals("Route")) {
-//            drawRoute(currentRoute);
-//        }
-//    }
+    @Override
+    public void update(Observable observable, Object event) {
+        switch ((String)event) {
+            case "State":
+                stateList = contentProvider.getStates();
+                drawStatePoints(stateList);
+                break;
+        }
+    }
 
     private void drawRoute(Route route) {
         PolylineOptions rectOptions = new PolylineOptions();
@@ -115,5 +125,12 @@ public class MapActivity extends AppCompatActivity implements OnMapReadyCallback
                 return p;
         }
         return null;
+    }
+
+    private void drawStatePoints(List<State> stateList) {
+        for(State state : stateList) {
+            LatLng odessa = new LatLng(state.getLat(), state.getLng());
+            mMap.addMarker(new MarkerOptions().position(odessa).title("Marker in Odessa"));
+        }
     }
 }

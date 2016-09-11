@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
+import max.com.realtimetransportodessa.activities.MapActivity;
 import max.com.realtimetransportodessa.model.Master;
 import max.com.realtimetransportodessa.model.Route;
 import max.com.realtimetransportodessa.model.State;
@@ -18,6 +19,7 @@ public class ContentProvider extends Observable {
     private List<Master> masterList;
     private Route route;
     private List<Route> loadedRoutes;
+    private List<State> currentRouteStates;
 
     private ContentProvider() {
         loadedRoutes = new ArrayList<>();
@@ -70,11 +72,21 @@ public class ContentProvider extends Observable {
         notifyObservers("Route");
     }
 
+    public void setState(List<State> stateList) {
+        this.currentRouteStates = stateList;
+        setChanged();
+        notifyObservers("State");
+    }
+
     public Route getRoute() {
         return this.route;
     }
 
     public List<Route> getLoadedRoutes() {
         return loadedRoutes;
+    }
+
+    public List<State> getStates() {
+        return currentRouteStates;
     }
 }
